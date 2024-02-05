@@ -35,7 +35,7 @@ requirements:
 EXAMPLES = r'''
     db2_get_ddf:
         db2ssid: DBDG
-    registr: ddf
+    register: ddf
 
     debug:
         msg: "TCPPORT = {{ ddf.tcpport }}"
@@ -143,7 +143,7 @@ def run_module():
     # create SYSTSIN TSO command file. NB uuid used to make the file unique
     cmdfile = "/tmp/db2_get_ddf_cmd_%s.txt" % (uuid.uuid4())
     with open(cmdfile, mode="w", encoding="cp1047") as ip:
-        ip.write("DSN S(DBDG)\n")
+        ip.write("DSN S(%s)\n" % (db2ssid))
         ip.write("  -DIS DDF\n")
         ip.write("END\n")
     systsin = FileDefinition(cmdfile)
