@@ -1,0 +1,28 @@
+---
+#
+# Get DDF Configuration
+#
+- name: "Get DDF Ports for DBDG"
+  hosts: zpdt
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  tasks:
+
+    - name: "Playbook start timestamp"
+      debug:
+        msg: "{{ lookup('pipe','date') }}"
+
+    - name: "Run -DIS DDF"
+      db2_get_ddf:
+        db2ssid: DBDG
+      register: ddf
+
+    - name: "What did we get?"
+      debug:
+        msg: "{{ ddf | to_nice_json }}"
+
+    - name: "Playbook end timestamp"
+      debug:
+        msg: "{{ lookup('pipe','date') }}"
+        
