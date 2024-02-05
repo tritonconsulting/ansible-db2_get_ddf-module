@@ -130,48 +130,34 @@ def run_module():
     params = module.params
     db2ssid = params['db2ssid']
     result['db2ssid'] = db2ssid
-    debug = False
-    # drive the tso DSN command - to do this, we need to setup the DD names
-    # ahead of calling IKJEFT01.
+    # setup DDs ahead of calling IKJEFT01.
     ddstmt = []
     # The Db2 load libraries should be named in the ssid_DB2LIBS environment variable
     db2libs = environ.get("%s_DB2LIBS" % (db2ssid))
     if (db2libs == "None"):
         db2libs = "DSND10.%s.SDSNEXIT:DSND10.SDSNLOAD" % (db2ssid)
-        if (debug): print("DEBUG : warning - defaulting DB2LIBS to %s" % (db2ssid))
     dl_ents = db2libs.split(':')
     steplib = []
-    if (debug): print("DEBUG : defining steplib")
     for dlds in dl_ents:
         steplib.append(DatasetDefinition(dlds))
-        if (debug): print("DEBUG : dlds = %s" % (dlds))
     ddstmt.append(DDStatement("steplib",steplib))
 
     # create SYSTSIN TSO command file. NB uuid used to make the file unique
-    if (debug): print("DEBUG : defining systsin file")
     cmdfile = "/tmp/db2_get_ddf_cmd_%s.txt" % (uuid.uuid4())
-    if (debug): print("DEBUG : file name = %s" % (cmdfile))
     with open(cmdfile, mode="w", encoding="cp1047") as ip:
         ip.write("DSN S(DBDG)\n")
         ip.write("  -DIS DDF\n")
         ip.write("END\n")
-    if (debug): print("DEBUG : defining systsin")
     systsin = FileDefinition(cmdfile)
     ddstmt.append(DDStatement("systsin",systsin))
 
     # make SYSTSPRT a SYSOUT=* allocation
-    if (debug): print("DEBUG : defining systsprt as sysout=*")
     ddstmt.append(DDStatement("systsprt","*"))
 
     # we have to call IKJEFT01 authorised for this to work
-    if (debug): print("DEBUG : driving IKJEFT01")
     rsp = mvscmd.execute_authorized(pgm="IKJEFT01",dds=ddstmt)
-    if (debug): 
-        print("DEBUG : response:")
-        print(rsp)
 
     # tidy up the SYSTSIN file
-    if (debug): print("DEBUG : tidying up temporary files")
     try:
         remove(cmdfile)
     except OSError:
@@ -183,10 +169,9 @@ def run_module():
     ddf = {}
     alias = {}
     capt = False
-    if (debug): print("DEBUG : RC = %d" % r.rc)
     if (r.rc == 0):
         for line in r.stdout_response.splitlines():
-            # lose the printer control character
+            # lose the print control character
             tline = line[1:].rstrip()
             if (len(tline.split()) > 1):
                 msgid, msg = tline.split(' ',1)
@@ -195,14 +180,6 @@ def run_module():
                     capt = True
                 if (capt):
                     out.append(tline)
-                    #filt = "[%s] " % (msgid)
-                    #xx = ""
-                    #wc = 0
-                    #for word in words:
-                    #  wc = wc + 1
-                    #  ax = "%d(%s)" % (wc,word)
-                    #  xx = xx + " " + ax
-                    #out.append("%s %s" % (filt,xx))
                     match msgid:
                         case "DSNL081I":
                             # STATUS=status
@@ -236,12 +213,11 @@ def run_module():
                             tp = words[0]
                             vl = words[2]
                             ddf[tp] = vl
-                if (msgid == "DSNL099I"):
-                    capt = False
+                        case "DSNL099I":
+                            capt = False
         if (len(alias) > 0):
             ddf['aliases'] = alias
         ddf['out'] = out
-        if (debug): print("Returning:\n%s" % (out))
     else:
         out.append("** rc = %d **" % (r.rc))
         out.append("stderr:")
@@ -250,11 +226,9 @@ def run_module():
         out.append("stdout:")
         for line in r.stdout_response.splitlines():
             out.append(line.rstrip()[1:])
-        if (debug): print("DEBUG : Error end - returning:\n%s" %(out))
         ddf['out'] = out
         result['ddf'] = ddf
         module.fail_json(msg='Error processing DSN command request',**result)
-    # return the results
     result['ddf'] = ddf
     result['changed'] = False
     # exit the module and return the json result
