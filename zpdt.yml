@@ -1,0 +1,9 @@
+source_systems:
+  hosts:
+    zpdt:
+      ansible_communication: ssh
+      ansible_host: 10.1.1.4
+      ansible_port: 65522
+      ansible_user: ibmuser
+      ansible_python_interpreter: /usr/lpp/IBM/cyp/v3r11/pyz/bin/python3
+      
