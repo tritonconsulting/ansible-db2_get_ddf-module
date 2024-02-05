@@ -4,8 +4,6 @@
 # Copyright: Triton Consulting
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-# __metaclass__ = type
-
 DOCUMENTATION = r'''
 ---
 module: db2_get_ddf
