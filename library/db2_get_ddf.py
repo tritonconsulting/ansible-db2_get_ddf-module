@@ -121,7 +121,7 @@ def run_module():
     # define the module argument(s)
     module = AnsibleModule(
         argument_spec = dict(
-            db2ssid = dict(type = 'str', required = True)
+            db2ssid = dict(type = 'str', aliases = ['ssid','db2'], required = True)
         )
     )
 
