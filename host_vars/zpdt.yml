@@ -1,0 +1,17 @@
+# Environment vars for zpdt
+PYZ: "/usr/lpp/IBM/cyp/v3r11/pyz"
+ZOAU: "/usr/lpp/IBM/zoautil"
+JAVA: "/usr/lpp/java/J11.0_64"
+
+# environment_vars
+environment_vars:
+  LANG: "C"
+  _BPXK_AUTOCVT: "ON"
+  ZOAU_HOME: "{{ ZOAU }}"
+  PYTHONHOME: "{{ PYZ }}"
+  JAVA_HOME: "{{ JAVA }}"
+  PYTHONPATH: "{{ ZOAU }}/lib"
+  LIBPATH: "{{ PYZ }}/lib:{{ ZOAU }}/lib:{{ JAVA }}/lib:/lib:/usr/lib"
+  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:{{ JAVA }}/bin:/bin:/usr/bin"
+  MANPATH: "{{ ZOAU }}/docs/%L"
+  DBDG_DB2LIBS: "DSND10.DBDG.SDSNEXIT:DSND10.SDSNLOAD"
